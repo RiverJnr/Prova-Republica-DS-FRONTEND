@@ -1,0 +1,133 @@
+<div class="container">
+    <h2 class="text-center border-bottom border-danger pb-2 mb-4" style="width: 60%; margin: auto;">
+        Cadastro de Conta
+    </h2>
+
+    <div class="alert alert-info text-center w-50 mx-auto mt-4 mb-4" *ngIf="saldoPendente !== null">
+        <strong>Saldo Pendente:</strong> R$ {{ saldoPendente.toFixed(2) }}
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="card card-body shadow-sm mb-4">
+
+        <div class="mb-3">
+            <label class="form-label">Valor</label>
+            <input type="number" class="form-control" [(ngModel)]="conta.valor" name="valor" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Data de Vencimento</label>
+            <input type="date" class="form-control" [(ngModel)]="conta.dataVencimento" name="dataVencimento" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Situação</label>
+            <select [(ngModel)]="conta.situacao" class="form-select" name="situacao">
+                <option *ngFor="let s of situacoes" [ngValue]="s">
+                    {{ situacaoLabels[s] }}
+                </option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tipo</label>
+            <select class="form-select" [(ngModel)]="conta.idTipo" name="idTipo" required>
+                <option *ngFor="let tipo of tipos" [value]="tipo.id">{{ tipo.nome }}</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Observação</label>
+            <textarea class="form-control" [(ngModel)]="conta.observacao" name="observacao"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <h5>Rateios</h5>
+            <div *ngFor="let rateio of conta.rateios; let i = index" class="border rounded p-3 mb-2">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label class="form-label">Morador</label>
+                        <select class="form-select" [(ngModel)]="rateio.idMorador" [name]="'rateio_morador_' + i"
+                            required>
+                            <option *ngFor="let m of moradores" [value]="m.id">{{ m.nome }}</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Valor</label>
+                        <input type="number" class="form-control" [(ngModel)]="rateio.valor"
+                            [name]="'rateio_valor_' + i" required />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Situação</label>
+                        <select class="form-select" [(ngModel)]="rateio.situacao" [name]="'rateio_situacao_' + i"
+                            required>
+                            <option *ngFor="let sit of situacoesEditaveis" [value]="sit">{{ situacaoLabels[sit] }}</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger w-100" (click)="removerRateio(i)">Remover</button>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary" (click)="adicionarRateio()">Adicionar Rateio</button>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Salvar Conta</button>
+    </form>
+
+    <h3>Contas Existentes</h3>
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Valor</th>
+                <th>Vencimento</th>
+                <th>Situação</th>
+                <th>Tipo</th>
+                <th>Responsável</th>
+                <th>Observação</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngFor="let c of contas">
+                <tr>
+                    <td>R$ {{ c.valor }}</td>
+                    <td>{{ c.dataVencimento | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ situacaoLabels[c.situacao] }}</td>
+                    <td>{{ getTipoNome(c.idTipo) }}</td>
+                    <td>{{ getMoradorNome(c.idMoradorResponsavel) }}</td>
+                    <td>{{ c.observacao }}</td>
+                </tr>
+
+                <tr *ngIf="c.rateios?.length">
+                    <td colspan="6">
+                        <strong>Rateios:</strong>
+                        <ul class="mb-0 ps-4 list-unstyled">
+                            <li *ngFor="let r of c.rateios"
+                                class="mb-2 d-flex align-items-center justify-content-between flex-wrap">
+                                <div>
+                                    Morador: {{ getMoradorNome(r.idMorador) }},
+                                    Valor: R$ {{ r.valor }},
+                                    Situação:
+                                    <ng-container *ngIf="r.idMorador === idMoradorResponsavel; else textoSituacao">
+                                        <select class="form-select d-inline-block w-auto ms-2" [(ngModel)]="r.situacao"
+                                            [name]="'situacaoRateio_' + r.id">
+                                            <option *ngFor="let sit of situacoesEditaveis" [value]="sit">{{ situacaoLabels[sit]
+                                                }}</option>
+                                        </select>
+                                        <button class="btn btn-sm btn-outline-primary ms-2" 
+                                            (click)="atualizarRateio(r)">Salvar</button>
+                                    </ng-container>
+                                    <ng-template #textoSituacao>
+                                        <span class="ms-2">{{ situacaoLabels[r.situacao] }}</span>
+                                    </ng-template>
+                                </div>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </ng-container>
+        </tbody>
+    </table>
+</div>

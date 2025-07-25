@@ -1,0 +1,36 @@
+<div class="container mt-5">
+  <h2 class="text-center border-bottom border-danger pb-2 w-75 mx-auto mb-4">Login</h2>
+
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow rounded">
+        <div class="card-body">
+          <form (submit)="onSubmit()">
+            <div class="mb-3 text-center">
+              <label for="username" class="form-label">Usuário</label>
+              <input [(ngModel)]="username" name="username" id="username" required class="form-control text-center" />
+            </div>
+
+            <div class="mb-3 text-center">
+              <label for="password" class="form-label">Senha</label>
+              <div class="input-group">
+                <input [(ngModel)]="password" name="password" id="password"
+                  [type]="showPassword ? 'text' : 'password'" required class="form-control text-center" />
+                <button type="button" class="btn btn-outline-secondary" (click)="togglePasswordVisibility()">
+                  {{ showPassword ? '🙈' : '👁️' }}
+                </button>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+              <button type="submit" class="btn btn-primary">Entrar</button>
+              <button type="button" class="btn btn-secondary" (click)="navigateToRegister()">Registrar</button>
+            </div>
+
+            <div *ngIf="error" class="text-danger text-center mt-3">{{ error }}</div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
